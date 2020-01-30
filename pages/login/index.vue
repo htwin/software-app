@@ -5,40 +5,55 @@
     </div>
     <el-form ref="form" :model="user" label-width="250px">
       <el-form-item label="学号">
-        <el-input v-model="user.name"></el-input>
+        <el-input v-model="user.account"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="pass">
         <el-input type="password" v-model="user.password" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="验证码">
-       
-          <el-input v-model="user.valicode"></el-input>
-        
+        <el-input v-model="user.valicode"></el-input>
+
         <div class="valicode">
           <img src="~/static/img/valicode.png" width="80px" height="60px" />
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">登录</el-button>
+        <el-button type="primary" @click="login(1)">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 <script>
+import { setUser } from "@/utils/auth";
+import userApi from "@/api/user";
 export default {
   data() {
     return {
-      user: {
-        name: 123,
-        password: 123,
-        valicode: ""
-      }
+      user: {}
     };
+  },
+  methods: {
+    login(a) {
+      userApi.loginByAccount(this.user).then(res => {
+        if (res.data.success) {
+          this.$message({
+            type: "info",
+            message: "登录成功"
+          });
+          //将token信息存入cookie
+          setUser(res.data.data.token, res.data.data.name);
+
+          //跳转到首页
+         // this.$router.push("/");
+          window.location.href="/"
+        }
+      });
+    }
   }
 };
 </script>
 <style>
-.valicode{
+.valicode {
   float: right;
 }
 .user-login {

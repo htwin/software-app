@@ -5,8 +5,10 @@
         <div>
           <el-col :span="16">
             <el-carousel :interval="4000" type="card" height="450px" style=" padding-top: 50px">
-              <el-carousel-item v-for="item in 4" :key="item">
-                <a :href="'/software/'+item"><img src="~/static/img/1.jpg" width="100%" height="100%" /></a>
+              <el-carousel-item v-for="(item,index) in carouselList" :key="index">
+                <a :href="'/software/'+item.softwareId">
+                  <img :src="item.pic" width="100%" height="100%" />
+                </a>
               </el-carousel-item>
             </el-carousel>
           </el-col>
@@ -18,16 +20,16 @@
                 <li>
                   <div class="new-soft-list">最新软件</div>
                 </li>
-                <li v-for="(o,index) in 3" :key="o">
+                <li v-for="(item,index) in newList" :key="index">
                   <el-card :body-style="{ padding: '0px' }">
-                    <a :href="'/software/'+index">
-                      <img src="~/static/img/2.jpg" class="image" />
+                    <a :href="'/software/'+item.id">
+                      <img :src="item.pic" class="image" />
                     </a>
                     <div style="padding: 14px;">
-                      <span>好吃的汉堡</span>
+                      <span>{{item.name}}</span>
                       <div class="bottom clearfix">
                         <time class="time">2020-01-05</time>
-                        <el-button type="text" class="button">下载</el-button>
+                        <el-button type="text" class="button" @click="download(item.name,item.url)">下载</el-button>
                       </div>
                     </div>
                   </el-card>
@@ -43,16 +45,16 @@
           <div class="hot-soft-list">推荐软件</div>
         </el-col>
 
-        <el-col :span="4" class="soft-list" v-for="(o,index) in 10" :key="o">
+        <el-col :span="4" class="soft-list" v-for="(item,index) in hotList" :key="index">
           <el-card :body-style="{ padding: '0px' }">
-            <a :href="'/software/'+index">
-              <img src="~/static/img/3.jpg" class="image" />
+            <a :href="'/software/'+item.id">
+              <img :src="item.pic" class="image" />
             </a>
             <div style="padding: 14px;">
-              <span>photoshop</span>
+              <span>{{item.name}}</span>
               <div class="bottom clearfix">
                 <time class="time">2020-01-05</time>
-                <el-button type="text" class="button">下载</el-button>
+                <el-button type="text" class="button" @click="download(item.name,item.url)">下载</el-button>
               </div>
             </div>
           </el-card>
@@ -64,10 +66,47 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
-
+import softApi from "@/api/soft";
+import carouselApi from "@/api/carousel";
+import axios from "axios";
+import {getUser} from "@/utils/auth"
 export default {
-  components: {
-    Logo
+  data() {
+    return {
+      soft: {},
+    };
+  },
+  methods: {
+    download(name, url) {
+    
+      //下载软件需要登录权限
+      if(getUser().user_name==undefined||getUser().user_name==""){
+        this.$message({
+            type: 'error',
+            message: '请登录'
+          });
+          
+          return
+      }else{
+          window.location.href="http://localhost:9000/soft/soft/download?name="+name+"&url="+url;
+      }
+      
+      
+    }
+  },
+  asyncData() {
+    return axios.all([softApi.newList(1, 3), softApi.hotList(1, 10),carouselApi.list()]).then(
+      axios.spread(function(newList, hotList,carouselList) {
+        return {
+          newList: newList.data.data.rows,
+          hotList: hotList.data.data.rows,
+          carouselList: carouselList.data.data
+          
+        };
+      }) 
+    );
+
+    
   }
 };
 </script>
@@ -80,7 +119,7 @@ export default {
   border-bottom: 1px solid #ebebeb;
 }
 .hot-soft-list {
-  width:800px;
+  width: 800px;
   font-size: 20px;
   font-family: "微软雅黑";
   margin-left: 10px;

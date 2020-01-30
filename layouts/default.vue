@@ -14,32 +14,41 @@
         <el-menu-item>
           <a href="https://www.ele.me" class="myFont" target="_blank">关于站点</a>
         </el-menu-item>
-        <el-menu-item>
-          <a href="/login"><el-button round class="loginButton">登录</el-button></a>
+        <el-menu-item v-if="user_name === ''||user_name===undefined">
+          <a href="/login">
+            <el-button round class="loginButton">登录</el-button>
+          </a>
+        </el-menu-item>
+        <el-menu-item v-if="user_name !== ''&&user_name!==undefined">
+          <div class="loginButton">
+            <span class="loginName">
+              欢迎您，
+              <span style="color:red">{{user_name}}</span>
+            </span>&nbsp;&nbsp;&nbsp;
+            
+              <el-button round @click="logout()">退出等录</el-button>
+            
+          </div>
         </el-menu-item>
       </el-menu>
 
       <el-menu :default-active="activeIndex" mode="horizontal" text-color="black">
-        <el-menu-item index="1">
+        <el-menu-item v-for="(item,index) in classifyList" :key="index" :index="index">
           <span class="myFont">
-            <a href="/classify/1">办公软件</a>
+            <a :href="'/classify/'+item.id">{{item.name}}</a>
           </span>
         </el-menu-item>
-        <el-menu-item index="2">
-          <span class="myFont"> <a href="/classify/2">绘图软件</a></span>
-        </el-menu-item>
-        <el-menu-item index="3">
-          <span class="myFont"><a href="/classify/3">视频剪辑</a></span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <span class="myFont"><a href="/classify/4">娱乐软件</a></span>
-        </el-menu-item>
-         <el-menu-item index="5">
-          <span class="myFont" style="color:red"><a href="/">首页</a></span>
+
+        <el-menu-item index="5">
+          <span class="myFont" style="color:red">
+            <a href="/">首页</a>
+          </span>
         </el-menu-item>
       </el-menu>
     </header>
+
     <nuxt />
+
     <footer>
       <div class="footer">
         <p>软件资源库-----@huangtong版权所有</p>
@@ -49,17 +58,53 @@
   </div>
 </template>
 <script>
+import classifyApi from "@/api/classify";
+import { getUser, removeUser } from "@/utils/auth";
 export default {
   data() {
     return {
-      activeIndex: "1"
+      activeIndex: "",
+      classifyList: [],
+      user_name: ""
     };
+  },
+  created() {
+    this.user_name = getUser().user_name;
+  },
+  mounted() {
+    classifyApi.list().then(res => {
+      this.classifyList = res.data.data;
+    });
+    
+  },
+  methods: {
+    logout() {
+      this.$confirm("确认退出登录?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          removeUser();
+          window.location.href="/"
+         
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消"
+          });
+        });
+    }
   }
 };
 </script>
 
 <style>
-
+.loginName {
+  margin-top: 10px;
+  font-size: 15px;
+}
 a {
   text-decoration: none;
   color: #333;
@@ -70,7 +115,7 @@ a {
   margin-top: 30px;
 }
 .loginButton {
-  margin-left: 600px;
+  margin-left: 500px;
 }
 .myFont {
   font-size: 20px;
