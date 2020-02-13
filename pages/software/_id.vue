@@ -18,13 +18,18 @@
           <div class="soft-info-summary">
             <el-row :gutter="1">
               <el-col :span="4">
-                <el-badge :value="soft.thumb" class="item">点赞</el-badge>
+                <a href="#" @click="thumb()">
+                  <el-badge :value="soft.thumb" class="item">
+                    点赞
+                    <el-button type="info" size="mini" icon="el-icon-thumb" circle></el-button>
+                  </el-badge>
+                </a>
               </el-col>
               <el-col :span="4">
-                <el-badge :value="soft.download" class="item">下载</el-badge>
+                <el-badge :value="soft.download" class="item">下载数</el-badge>
               </el-col>
               <el-col :span="4">
-                <el-badge :value="soft.comment" class="item">评论</el-badge>
+                <el-badge :value="soft.comment" class="item">评论数</el-badge>
               </el-col>
               <el-col :span="4">
                 <a :href="'/tutorial/'+soft.id" style="color:red">安装教程链接</a>
@@ -59,7 +64,7 @@
               </el-col>
               <el-col :span="6">
                 <div class="soft-comment-start">
-                  <el-button type="primary" size="mini" @click="dialogFormVisible = true">发表评论</el-button>
+                  <el-button type="primary" size="mini" @click="toComment()">发表评论</el-button>
                 </div>
               </el-col>
             </el-row>
@@ -94,7 +99,8 @@
 <script>
 import softApi from "@/api/soft";
 import commentApi from "@/api/comment";
-import { getUser } from "@/utils/auth";
+import userApi from "@/api/user";
+import { getUser, setThumb, setDownload } from "@/utils/auth";
 export default {
   data() {
     return {
@@ -109,6 +115,47 @@ export default {
     };
   },
   methods: {
+    //点赞软件
+    thumb() {
+      //登录才可以点赞
+      if (getUser().user_name == undefined || getUser().user_name == "") {
+        this.$message({
+          type: "error",
+          message: "请登录"
+        });
+
+        return;
+      } else {
+        //判断用户是否已经点赞该软件
+        userApi.getUserSoftThu(getUser().user_id, this.soft.id).then(res => {
+          if (res.data.success) {
+            if (res.data.data != undefined || res.data.data != null) {
+              this.$message({
+                type: "info",
+                message: "你已经点过赞了！！！"
+              });
+              return;
+            } else {
+              userApi.thumb(getUser().user_id, this.soft.id).then(res => {
+                if (res.data.success) {
+                  this.soft.thumb = this.soft.thumb + 1;
+                } else {
+                  this.$message({
+                    type: "error",
+                    message: "系统异常"
+                  });
+                }
+              });
+            }
+          } else {
+            this.$message({
+              type: "error",
+              message: "系统异常111"
+            });
+          }
+        });
+      }
+    },
     //下载软件
     download(name, url) {
       //下载软件需要登录权限
@@ -120,19 +167,44 @@ export default {
 
         return;
       } else {
+        //下载软件后期优化
+
         window.location.href =
           "http://localhost:9000/soft/soft/download?name=" +
           name +
           "&url=" +
           url;
+
+      
+        userApi.downloads(getUser().user_id, this.soft.id).then(res => {
+          if (res.data.success) {
+            this.soft.download = this.soft.download + 1;
+            
+          }
+        });
       }
     },
+
+    toComment() {
+      //评论软件需要登录权限
+      if (getUser().user_name == undefined || getUser().user_name == "") {
+        this.$message({
+          type: "error",
+          message: "请登录"
+        });
+
+        return;
+      } else {
+        this.dialogFormVisible = true;
+      }
+    },
+
     //发表评论
     addComment() {
-      this.comment.userId = "1";
+      this.comment.userId = getUser().user_id;
       this.comment.softwareId = this.soft.id;
       this.comment.parentId = "0";
-      this.comment.reviewer = "用户2";
+      this.comment.reviewer = getUser().user_name;
 
       commentApi.addComment(this.comment).then(res => {
         if (res.data.success) {
@@ -140,7 +212,8 @@ export default {
             type: "info",
             message: "评论成功"
           });
-
+          this.soft.comment += 1;
+          this.comment = {};
           this.commentList.push(res.data.data);
         } else {
           this.$message({

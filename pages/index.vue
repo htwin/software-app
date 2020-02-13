@@ -28,8 +28,8 @@
                     <div style="padding: 14px;">
                       <span>{{item.name}}</span>
                       <div class="bottom clearfix">
-                        <time class="time">2020-01-05</time>
-                        <el-button type="text" class="button" @click="download(item.name,item.url)">下载</el-button>
+                        <time class="time">{{item.createtime|formatDate}}</time>
+                        <el-button type="text" class="button" @click="download(item.id,item.name,item.url)">下载</el-button>
                       </div>
                     </div>
                   </el-card>
@@ -53,8 +53,8 @@
             <div style="padding: 14px;">
               <span>{{item.name}}</span>
               <div class="bottom clearfix">
-                <time class="time">2020-01-05</time>
-                <el-button type="text" class="button" @click="download(item.name,item.url)">下载</el-button>
+                <time class="time">{{item.createtime|formatDate}}</time>
+                <el-button type="text" class="button" @click="download(item.id,item.name,item.url)">下载</el-button>
               </div>
             </div>
           </el-card>
@@ -70,14 +70,26 @@ import softApi from "@/api/soft";
 import carouselApi from "@/api/carousel";
 import axios from "axios";
 import {getUser} from "@/utils/auth"
+import { formatDate } from '@/utils/date.js'
+import userApi from '@/api/user'
 export default {
   data() {
     return {
       soft: {},
     };
   },
+  filters: {
+   /*
+    时间格式自定义 只需把字符串里面的改成自己所需的格式
+   */ 
+   formatDate(time) {
+    var date = new Date(time);
+    return formatDate(date, 'yyyy-MM-dd hh:mm:ss'); 
+   },
+  
+  },
   methods: {
-    download(name, url) {
+    download(softId,name, url) {
     
       //下载软件需要登录权限
       if(getUser().user_name==undefined||getUser().user_name==""){
@@ -89,6 +101,7 @@ export default {
           return
       }else{
           window.location.href="http://localhost:9000/soft/soft/download?name="+name+"&url="+url;
+          userApi.downloads(getUser().user_id,softId);
       }
       
       

@@ -14,6 +14,15 @@
         <el-menu-item>
           <a href="https://www.ele.me" class="myFont" target="_blank">关于站点</a>
         </el-menu-item>
+
+        <el-menu-item>
+          <div style="margin-left: 5px;">
+            <el-input size="medium" placeholder="请输入内容" v-model="searchValue" class="search-input">
+              <el-button slot="append" @click="search()">搜索</el-button>
+            </el-input>
+          </div>
+        </el-menu-item>
+
         <el-menu-item v-if="user_name === ''||user_name===undefined">
           <a href="/login">
             <el-button round class="loginButton">登录</el-button>
@@ -25,15 +34,16 @@
               欢迎您，
               <span style="color:red">{{user_name}}</span>
             </span>&nbsp;&nbsp;&nbsp;
-            
-              <el-button round @click="logout()">退出等录</el-button>
-            
+            <a :href="'/user?id='+user_id">
+              <el-button round>个人主页</el-button>
+            </a>
+            <el-button round @click="logout()">退出等录</el-button>
           </div>
         </el-menu-item>
       </el-menu>
 
-      <el-menu :default-active="activeIndex" mode="horizontal" text-color="black">
-        <el-menu-item v-for="(item,index) in classifyList" :key="index" :index="index">
+      <el-menu :default-active="activeIndex" mode="horizontal" text-color="black" >
+        <el-menu-item v-for="(item,index) in classifyList" :key="index" :index="item.id" >
           <span class="myFont">
             <a :href="'/classify/'+item.id">{{item.name}}</a>
           </span>
@@ -63,21 +73,37 @@ import { getUser, removeUser } from "@/utils/auth";
 export default {
   data() {
     return {
-      activeIndex: "",
+      activeIndex:"",
       classifyList: [],
-      user_name: ""
+      user_name: "",
+      user_id: "",
+      searchValue: ""
     };
   },
   created() {
     this.user_name = getUser().user_name;
+    this.user_id = getUser().user_id;
+    console.log(getUser());
   },
   mounted() {
     classifyApi.list().then(res => {
       this.classifyList = res.data.data;
     });
-    
   },
   methods: {
+    search(){
+
+      if(this.searchValue==undefined||this.searchValue.trim()==""){
+        this.$message({
+          type:"error",
+          message:"查询内容为空！！！"
+        })
+        return
+      }
+
+      this.$router.push("/search/"+this.searchValue)
+      console.log(this.searchValue)
+    },
     logout() {
       this.$confirm("确认退出登录?", "提示", {
         confirmButtonText: "确定",
@@ -86,8 +112,7 @@ export default {
       })
         .then(() => {
           removeUser();
-          window.location.href="/"
-         
+          window.location.href = "/";
         })
         .catch(() => {
           this.$message({
@@ -101,6 +126,9 @@ export default {
 </script>
 
 <style>
+.search-input {
+  background-color: #fff;
+}
 .loginName {
   margin-top: 10px;
   font-size: 15px;
@@ -115,7 +143,8 @@ a {
   margin-top: 30px;
 }
 .loginButton {
-  margin-left: 500px;
+  margin-left: 80px;
+  
 }
 .myFont {
   font-size: 20px;

@@ -15,7 +15,7 @@
               <span>{{item.name}}</span>
               <div class="bottom clearfix">
                 <time class="time">{{item.createtime|formatDate}}</time>
-                <el-button type="text" class="button" @click="download(item.id,item.name,item.url)">下载</el-button>
+                <el-button type="text" class="button" @click="download(item.name,item.url)">下载</el-button>
               </div>
             </div>
           </el-card>
@@ -32,16 +32,16 @@ import "~/assets/style.css";
 import softApi from '@/api/soft'
 import { getUser } from "@/utils/auth";
 import { formatDate } from '@/utils/date.js'
-import userApi from '@/api/user'
 export default {
   data() {
     return {
       
       pageSize: 10,
-      total: 30,
+      total: 0,
       classifyId:"",
       softList:[],
-      page:1
+      page:1,
+      searchValue:""
     };
   },
   
@@ -56,19 +56,37 @@ export default {
   
   },
   mounted(){
-    this.classifyId = this.$route.params.classify;
-    this.findByClassifyId(this.classifyId,this.page,this.pageSize);
+    this.searchValue = this.$route.params.search;
+    this.search(this.page,this.pageSize,{name:this.searchValue});
   },
   methods:{
-    findByClassifyId(classifyId,page,size){
-      softApi.findByClassifyId(classifyId,page,size).then(res=>{
+    search(page,size,searchValue){
+     softApi.search(page,size,searchValue).then(res=>{
         
-        this.softList = res.data.data.rows;
-        this.total = res.data.data.total;
+     
+     if(res.data.data == null){
+          this.$message({
+              type:"info",
+              message:"没有查询到内容"
+          })
+          this.$router.go(-1)
+          return
+      }
+      this.softList = res.data.data.rows;
+      this.total = res.data.data.total;
+      if(this.softList.length < 1){
+          this.$message({
+              type:"info",
+              message:"没有查询到内容"
+          })
+          this.$router.go(-1)
+      }
+     
       
-      })
+    })
+     
     },
-    download(softId,name,url){
+    download(name,url){
        //下载软件需要登录权限
       if (getUser().user_name == undefined || getUser().user_name == "") {
         this.$message({
@@ -83,10 +101,6 @@ export default {
           name +
           "&url=" +
           url;
-
-        userApi.downloads(getUser().user_id,softId);
-
-
       }
     // window.location.href="http://localhost:9000/soft/soft/download?name="+name+"&url="+url;
     }

@@ -41,11 +41,17 @@ export default {
             message: "登录成功"
           });
           //将token信息存入cookie
-          setUser(res.data.data.token, res.data.data.name);
+          console.log(res.data.data)
+          setUser(res.data.data.token, res.data.data.name,res.data.data.id);
 
-          //跳转到首页
+          //跳转到首页 
          // this.$router.push("/");
           window.location.href="/"
+        }else{
+          this.$message({
+            type: "error",
+            message: "用户名或密码错误"
+          });
         }
       });
     }

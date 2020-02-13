@@ -1,27 +1,27 @@
 <template>
   <div>
     <ul>
-      <li class="user-thumb" v-for="(o,index) in 4" :key="o">
+      <li class="user-thumb" v-for="(item,index) in softList" :key="index">
         <el-row>
           <el-col :span="24">
             <el-card class="card" shadow="hover">
               <el-row>
                 <el-col :span="8">
-                  <a href="/software/1">
+                  <a :href="'/software/'+item.id">
                     <el-image
                       style="width: 150px; height: 100px"
-                      :src="'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'"
+                      :src="item.pic"
                       :fit="'contain'"
                     ></el-image>
                   </a>
                 </el-col>
                 <el-col :span="8">
-                  <div class="user-thumb-title">xxxxx软件名称{{index}}</div>
+                  <div class="user-thumb-title">{{item.name}}</div>
                 </el-col>
                 <el-col :span="5">
                   <div class="user-thumb-score">
                     <el-rate
-                      v-model="value"
+                      v-model="item.score"
                       disabled
                       show-score
                       text-color="#ff9900"
@@ -38,11 +38,22 @@
   </div>
 </template>
 <script>
+import softApi from "@/api/soft";
+import { getUser } from "@/utils/auth";
 export default {
   data() {
     return {
-      value: 3.7
+   
+      softIds:"",
+      softList:[]
     };
+  },
+  created(){
+   
+    softApi.userThumb(getUser().user_id).then(res=>{
+      this.softList = res.data.data
+      console.log(this.softList)
+    })
   }
 };
 </script>

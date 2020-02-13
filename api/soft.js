@@ -35,5 +35,28 @@ export  default{
             url: `/${group_name}/${api_name}/${id}`,
             method: "get"
         })
+    },
+    //查询用户点赞的软件列表
+    userThumb(userThumb){
+        return request({
+            url: `/${group_name}/${api_name}/userThumb/${userThumb}`,
+            method: "get"
+        })
+    },
+    //查询用户下载过的软件列表
+    userDownload(userDownload){
+        return request({
+            url: `/${group_name}/${api_name}/userDownload/${userDownload}`,
+            method: "get"
+        })
+    },
+     //软件列表  支持模糊查询
+    search(page,size,entity){
+        return request({
+            url: `/${group_name}/${api_name}/search/${page}/${size}`,
+            method: "post",
+            data:entity
+        })
     }
+    
 }

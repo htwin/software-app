@@ -11,7 +11,7 @@
           <div class="user-aside">
             <ul>
               <li>
-                <el-link type="primary"  href="/user/user-info">个人信息</el-link>
+                <el-link type="primary"  :href="'/user?id='+user.id">个人信息</el-link>
               </li>
               <li>
                 <el-link type="primary" href="/user/myThumb">我的点赞</el-link>
@@ -32,7 +32,24 @@
   </div>
 </template>
 <script>
-export default {};
+import userApi from "@/api/user"
+import {getUser} from "@/utils/auth"
+export default {
+  data(){
+    return{
+      user:{
+        id:getUser().user_id,
+        name:getUser().user_name,
+        thumb:getUser().user_thumb,
+        download:getUser().user_download
+      }
+    }
+  },
+ 
+  created(){
+   
+  }
+};
 </script>
 <style>
 .user-aside {
