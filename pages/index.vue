@@ -29,7 +29,11 @@
                       <span>{{item.name}}</span>
                       <div class="bottom clearfix">
                         <time class="time">{{item.createtime|formatDate}}</time>
-                        <el-button type="text" class="button" @click="download(item.id,item.name,item.url)">下载</el-button>
+                        <el-button
+                          type="text"
+                          class="button"
+                          @click="download(item.id,item.name,item.url)"
+                        >下载</el-button>
                       </div>
                     </div>
                   </el-card>
@@ -54,7 +58,11 @@
               <span>{{item.name}}</span>
               <div class="bottom clearfix">
                 <time class="time">{{item.createtime|formatDate}}</time>
-                <el-button type="text" class="button" @click="download(item.id,item.name,item.url)">下载</el-button>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="download(item.id,item.name,item.url)"
+                >下载</el-button>
               </div>
             </div>
           </el-card>
@@ -66,60 +74,58 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
+import common from "@/utils/common"
 import softApi from "@/api/soft";
 import carouselApi from "@/api/carousel";
 import axios from "axios";
-import {getUser} from "@/utils/auth"
-import { formatDate } from '@/utils/date.js'
-import userApi from '@/api/user'
+import { getUser } from "@/utils/auth";
+import { formatDate } from "@/utils/date.js";
+import userApi from "@/api/user";
+
 export default {
   data() {
     return {
-      soft: {},
+      soft: {}
     };
   },
   filters: {
-   /*
+    /*
     时间格式自定义 只需把字符串里面的改成自己所需的格式
-   */ 
-   formatDate(time) {
-    var date = new Date(time);
-    return formatDate(date, 'yyyy-MM-dd hh:mm:ss'); 
-   },
-  
+   */
+
+    formatDate(time) {
+      var date = new Date(time);
+      return formatDate(date, "yyyy-MM-dd hh:mm:ss");
+    }
   },
   methods: {
-    download(softId,name, url) {
-    
+    download(softId, name, url) {
       //下载软件需要登录权限
-      if(getUser().user_name==undefined||getUser().user_name==""){
+      if (getUser().user_name == undefined || getUser().user_name == "") {
         this.$message({
-            type: 'error',
-            message: '请登录'
-          });
-          
-          return
-      }else{
-          window.location.href="http://localhost:9000/soft/soft/download?name="+name+"&url="+url;
-          userApi.downloads(getUser().user_id,softId);
+          type: "error",
+          message: "请登录"
+        });
+
+        return;
+      } else {
+        common.downloadFile(name,url);
+        
       }
-      
-      
     }
   },
   asyncData() {
-    return axios.all([softApi.newList(1, 3), softApi.hotList(1, 10),carouselApi.list()]).then(
-      axios.spread(function(newList, hotList,carouselList) {
-        return {
-          newList: newList.data.data.rows,
-          hotList: hotList.data.data.rows,
-          carouselList: carouselList.data.data
-          
-        };
-      }) 
-    );
-
-    
+    return axios
+      .all([softApi.newList(1, 3), softApi.hotList(1, 10), carouselApi.list()])
+      .then(
+        axios.spread(function(newList, hotList, carouselList) {
+          return {
+            newList: newList.data.data.rows,
+            hotList: hotList.data.data.rows,
+            carouselList: carouselList.data.data
+          };
+        })
+      );
   }
 };
 </script>

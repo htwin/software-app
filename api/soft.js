@@ -57,6 +57,15 @@ export  default{
             method: "post",
             data:entity
         })
-    }
+    },
+     //下载软件
+     downloadFile(name,url){
+        return request({
+            url: `/${group_name}/${api_name}/download?name=${name}&url=${url}`,
+            method: "get",
+            responseType:'blob'
+          
+        })
+    },
     
 }

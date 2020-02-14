@@ -77,7 +77,7 @@
                 <el-button style="float: right; padding: 3px 0" type="text">回复(10)</el-button>
               </div>
               <div class="text">{{item.content}}</div>
-              <div class="comment-time">{{item.createtime}}</div>
+              <div class="comment-time">{{item.createtime|formatDate}}</div>
             </el-card>
           </div>
         </el-col>
@@ -101,6 +101,8 @@ import softApi from "@/api/soft";
 import commentApi from "@/api/comment";
 import userApi from "@/api/user";
 import { getUser, setThumb, setDownload } from "@/utils/auth";
+import common from "@/utils/common"
+import { formatDate } from "@/utils/date.js";
 export default {
   data() {
     return {
@@ -113,6 +115,16 @@ export default {
       pageSize: 5, //评论列表的每次加载的数量
       commentList: []
     };
+  },
+  filters: {
+    /*
+    时间格式自定义 只需把字符串里面的改成自己所需的格式
+   */
+
+    formatDate(time) {
+      var date = new Date(time);
+      return formatDate(date, "yyyy-MM-dd hh:mm:ss");
+    }
   },
   methods: {
     //点赞软件
@@ -168,18 +180,10 @@ export default {
         return;
       } else {
         //下载软件后期优化
-
-        window.location.href =
-          "http://localhost:9000/soft/soft/download?name=" +
-          name +
-          "&url=" +
-          url;
-
-      
+        common.downloadFile(name,url);
         userApi.downloads(getUser().user_id, this.soft.id).then(res => {
           if (res.data.success) {
             this.soft.download = this.soft.download + 1;
-            
           }
         });
       }

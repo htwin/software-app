@@ -33,6 +33,7 @@ import softApi from '@/api/soft'
 import { getUser } from "@/utils/auth";
 import { formatDate } from '@/utils/date.js'
 import userApi from '@/api/user'
+import common from "@/utils/common"
 export default {
   data() {
     return {
@@ -78,15 +79,7 @@ export default {
 
         return;
       } else {
-        window.location.href =
-          "http://localhost:9000/soft/soft/download?name=" +
-          name +
-          "&url=" +
-          url;
-
-        userApi.downloads(getUser().user_id,softId);
-
-
+       common.downloadFile(name,url);
       }
     // window.location.href="http://localhost:9000/soft/soft/download?name="+name+"&url="+url;
     }

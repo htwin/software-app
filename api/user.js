@@ -26,6 +26,8 @@ export default{
           
         })
     },
+   
+
     //下载软件，更新用户的下载软件列表
     downloads(userId,softId){
         return request({
