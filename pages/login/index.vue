@@ -41,7 +41,7 @@ export default {
             message: "登录成功"
           });
           //将token信息存入cookie
-          console.log(res.data.data)
+         
           setUser(res.data.data.token, res.data.data.name,res.data.data.id);
 
           //跳转到首页 

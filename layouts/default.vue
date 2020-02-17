@@ -12,7 +12,7 @@
           </span>
         </el-menu-item>
         <el-menu-item>
-          <a href="https://www.ele.me" class="myFont" target="_blank">关于站点</a>
+          <a href="#" class="myFont" target="_blank">关于站点</a>
         </el-menu-item>
 
         <el-menu-item>
@@ -83,9 +83,10 @@ export default {
   created() {
     this.user_name = getUser().user_name;
     this.user_id = getUser().user_id;
-    console.log(getUser());
+    
   },
   mounted() {
+    
     classifyApi.list().then(res => {
       this.classifyList = res.data.data;
     });
@@ -143,7 +144,7 @@ a {
   margin-top: 30px;
 }
 .loginButton {
-  margin-left: 80px;
+  margin-left: 70px;
   
 }
 .myFont {

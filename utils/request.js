@@ -10,7 +10,6 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
       // do something before request is sent
-        console.log("getUser().user_token::::::"+getUser().user_token)
       if (getUser().user_token!=undefined) {
         // let each request carry token
         // ['X-Token'] is a custom headers key
@@ -21,7 +20,7 @@ service.interceptors.request.use(
     },
     error => {
       // do something with request error
-      console.log(error) // for debug
+      console.log("error11111:"+error) // for debug
       return Promise.reject(error)
     }
   )

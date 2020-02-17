@@ -1,4 +1,6 @@
 import softApi from "@/api/soft"
+import userApi from "@/api/user"
+import {getUser} from '@/utils/auth'
 export default{
     downloadFile(name, url){
         softApi.downloadFile(name, url).then(res => {
