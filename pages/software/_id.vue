@@ -74,7 +74,7 @@
             <el-card class="box-card" shadow="hover">
               <div slot="header" class="comment-username">
                 <span>{{item.reviewer}}</span>
-                <el-button style="float: right; padding: 3px 0" type="text">回复(10)</el-button>
+                <el-button style="float: right; padding: 3px 0" type="text"></el-button>
               </div>
               <div class="text">{{item.content}}</div>
               <div class="comment-time">{{item.createtime|formatDate}}</div>

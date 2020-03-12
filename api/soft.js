@@ -67,5 +67,13 @@ export  default{
           
         })
     },
+    //评分软件
+    doRate(userSoftDownload){
+        return request({
+            url: `/${group_name}/${api_name}/doRate`,
+            method: "post",
+            data: userSoftDownload
+        })
+    }
     
 }
